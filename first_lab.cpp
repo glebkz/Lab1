@@ -1,24 +1,41 @@
-﻿#include <iostream>
+#include <iostream>
+#include <string>
 
-//Объявляем функцию
-int* create_array(int n);
+//Создаём структуру-узел
+struct Part {
+    int info; //информация о содержимом элемента стека
+    Part* next; //указатель на следующий элемент стека
+};
 
-int* create_array(int n)
-{
-    int* A;
-    A = new int[n]; // Создаем массив введенной размерности
-    return A; //возвращаем указатель на массив
-}
+//шаблон стека
+class STACK {
+public:
+    Part* first; //начало стека
+    STACK() : first(nullptr) {}; 
+    void in(int v) { //Метод добавления элемента в стек
+        Part* part = new Part(); //Создание нового узла
+        (*part).info = v; //Присваивание элемента узлу
+        (*part).next = first; //Связывание узла с прошлым первым элементом в стеке
+        first = part;
+    }
+    int out() {//Метод извлечения элемента из стека
+        Part* first1 = first; // Временный указатель на первый элемент
+        int v = (*first1).info; // Сохранение содержимового по этому указателю
+        first = (*first).next; // Второй элемент в стеке теперь первый
+        delete(first1); // Освобождение памяти
+        return v;
+    }
+};
 
 int main(int argc, char* argv[])
 {
     setlocale(LC_ALL, "Russian"); //Подключаем поддержку русского языка в командной строке
+    STACK Stack; //Создаём экземпеляр Stack класса STACK
     int i = 0, j = 0, x; //Объявляем переменные
-    int* mas, * mas1; //Объявляем указатели
     bool argv_after = true;
-    mas = create_array(1); //Создаём массив 
     if (argv[1] != nullptr) { // проверяем, существует ли аргумент
-        if (argv[1][0] == 'f' && argv[1][1] == 'a' && argv[1][2] == 'l' && argv[1][3] == 's' && argv[1][4] == 'e' && argv[1][5] == '\0') { //проверяем, false или что-то другое
+        std::string s = argv[1];
+        if (s == "false") { //проверяем, false или нет
             argv_after = false;
         }
     }
@@ -26,14 +43,8 @@ int main(int argc, char* argv[])
         do
         {
             std::cin >> x;
-            mas1 = create_array(i + 1);
-            for (int j = 0; j < i; j++)
-                mas1[j] = mas[j];
-            mas1[i] = x;
-            mas = create_array(i + 1);
-            for (int j = 0; j < i; j++)
-                mas[j] = mas1[j];
-            mas[i] = x;
+            if (x == 0) break;
+            Stack.in(x); 
             i++;
         } while (x != 0);
     }
@@ -45,20 +56,15 @@ int main(int argc, char* argv[])
         do {
             std::cout << "Введите число:" << std::endl;
             std::cin >> x; //Вводим число
-            mas1 = create_array(i + 1); //Создаём временный массив
-            for (int j = 0; j < i; j++)
-                mas1[j] = mas[j]; //Копируем в массив содержимое текущей последовательности
-            mas1[i] = x; //Копируем в массив введённое число
-            mas = create_array(i + 1); //Пересоздаём массив с последовательностью
-            for (int j = 0; j < i; j++)
-                mas[j] = mas1[j]; // Заполняем массив последовательностью из временного массива
-            mas[i] = x; //Добавляем в массив введённое число
+            if (x == 0) break; //0 не заносится в стек
+            Stack.in(x); //Добавляем x в стек
             i++;
         } while (x != 0);
         std::cout << "Вы ввели 0. Это означает окончание последовательности. Ниже - положительные числа последовательности в обратном порядке:";
     }
     for (j = i - 1; j >= 0; j--) { //выводим содержимое последовательности в обратном порядке без отрицательных чисел
-        if (mas[j] > 0) std::cout << mas[j] << std::endl;
+        x = Stack.out(); // Сохраняем содержимое 1-ого элемента в стеке в x
+        if (x > 0)std::cout << x << std::endl;
     }
     return 0;
 }
